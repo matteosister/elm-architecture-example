@@ -1,8 +1,9 @@
 module View exposing (view)
 
+import AppMessage
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (href)
+import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onClick)
 import Model exposing (Model, Msg(..))
 import PersonList.View
@@ -26,16 +27,17 @@ view model =
     in
     Browser.Document
         title
-        [ viewMenu
-        , content
+        [ viewMenu model.route
+        , div [ class "container" ] [ content ]
+        , div [] (List.map AppMessage.render model.appMessages)
         ]
 
 
-viewMenu : Html Msg
-viewMenu =
-    nav []
-        [ a [ href "/" ] [ text "homepage" ]
-        , a [ href "/lista-persone" ] [ text "lista persone" ]
+viewMenu : Route -> Html Msg
+viewMenu route =
+    ul [ class "nav justify-content-center nav-pills" ]
+        [ li [ class "nav-item" ] [ a [ classList [ ( "nav-link", True ), ( "active", route == Homepage ) ], href "/" ] [ text "homepage" ] ]
+        , li [ class "nav-item" ] [ a [ classList [ ( "nav-link", True ), ( "active", route == PersonList ) ], href "/lista-persone" ] [ text "lista persone" ] ]
         ]
 
 

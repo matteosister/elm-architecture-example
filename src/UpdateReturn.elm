@@ -1,24 +1,44 @@
-module UpdateReturn exposing (UpdateReturn, emptyUpdateReturn, getCommand, simpleGetRequest)
+module UpdateReturn exposing
+    ( UpdateReturn
+    , emptyUpdateReturn
+    , getCommand
+    , getMessages
+    , simpleGetRequest
+    , withMessage
+    , withoutAppMessage
+    )
 
+import AppMessage exposing (AppMessage)
 import Http
 import Model exposing (Msg)
 
 
 type alias UpdateReturn msg =
     { requests : List (Request msg)
+    , messages : List AppMessage
     }
 
 
 emptyUpdateReturn : UpdateReturn msg
 emptyUpdateReturn =
-    UpdateReturn []
+    UpdateReturn [] []
 
 
 simpleGetRequest : Http.Expect msg -> UpdateReturn msg
 simpleGetRequest expect =
     UpdateReturn
-        [ SimpleGetRequest { expect = expect }
-        ]
+        [ SimpleGetRequest { expect = expect } ]
+        []
+
+
+withMessage : AppMessage -> UpdateReturn msg -> UpdateReturn msg
+withMessage message updateReturn =
+    { updateReturn | messages = message :: updateReturn.messages }
+
+
+withoutAppMessage : UpdateReturn msg -> UpdateReturn msg
+withoutAppMessage updateReturn =
+    { updateReturn | messages = [] }
 
 
 type Request msg
@@ -49,17 +69,19 @@ convertToRequestData url request =
             , url = url
             , body = Http.emptyBody
             , expect = expect
-            , timeout = Nothing
+            , timeout = Just 800
             , tracker = Nothing
             }
 
 
 getCommand : Url -> (msg -> Msg) -> UpdateReturn msg -> Cmd Msg
 getCommand url mapper { requests } =
-    let
-        requestCommands =
-            requests
-                |> List.map (convertToRequestData url)
-                |> List.map (Cmd.map mapper << Http.request)
-    in
-    Cmd.batch requestCommands
+    requests
+        |> List.map (convertToRequestData url)
+        |> List.map (Cmd.map mapper << Http.request)
+        |> Cmd.batch
+
+
+getMessages : UpdateReturn msg -> List AppMessage
+getMessages { messages } =
+    messages

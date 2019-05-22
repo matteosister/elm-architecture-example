@@ -1,5 +1,6 @@
 module Model exposing (Flags, Model, Msg(..), initialModel)
 
+import AppMessage exposing (AppMessage)
 import Browser
 import Browser.Navigation as Nav
 import PersonList.Model
@@ -18,9 +19,14 @@ type alias Flags =
 
 
 type alias Model =
-    { flags : Flags, route : Routing.Route, key : Nav.Key, personListModel : PersonList.Model.Model }
+    { flags : Flags
+    , route : Routing.Route
+    , key : Nav.Key
+    , personListModel : PersonList.Model.Model
+    , appMessages : List AppMessage
+    }
 
 
 initialModel : Flags -> Routing.Route -> Nav.Key -> Model
 initialModel flags route key =
-    Model flags route key PersonList.Model.initialModel
+    Model flags route key PersonList.Model.initialModel []

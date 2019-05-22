@@ -35,4 +35,12 @@ update msg model =
                 updateReturnCommand =
                     UpdateReturn.getCommand model.flags.swapiUrl PersonListMsg updateReturn
             in
-            ( { model | personListModel = subModel }, Cmd.batch [ updateReturnCommand, Cmd.map PersonListMsg subCmd ] )
+            ( { model
+                | personListModel = subModel
+                , appMessages = UpdateReturn.getMessages updateReturn
+              }
+            , Cmd.batch
+                [ updateReturnCommand
+                , Cmd.map PersonListMsg subCmd
+                ]
+            )

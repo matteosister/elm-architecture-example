@@ -1,7 +1,7 @@
 module PersonList.View exposing (view)
 
 import Html exposing (..)
-import Html.Attributes exposing (disabled)
+import Html.Attributes exposing (class, disabled)
 import Html.Events exposing (onClick)
 import PersonList.Model exposing (Model, Msg(..), Persona)
 
@@ -11,15 +11,16 @@ view model =
     let
         content =
             if model.loading then
-                div [] [ text "loading..." ]
+                div [ class "spinner-border" ] [ span [ class "sr-only" ] [ text "Loading..." ] ]
 
             else
-                div [] (List.map viewPerson model.persone)
+                ul [ class "list-group" ] (List.map viewPerson model.persone)
     in
     ( "Lista Persone"
     , div []
-        [ h2 [] [ text "lista persone" ]
-        , button [ onClick Reload, disabled model.loading ] [ text "reload" ]
+        [ hr [] []
+        , button [ onClick Reload, disabled model.loading, class "btn btn-primary" ] [ text "reload" ]
+        , hr [] []
         , content
         ]
     )
@@ -27,4 +28,4 @@ view model =
 
 viewPerson : Persona -> Html Msg
 viewPerson persona =
-    div [] [ text persona.name ]
+    li [ class "list-group-item" ] [ text persona.name ]
